@@ -11,7 +11,7 @@
 #include "util/util_math.h"
 
 static void regist_callbacks(duk_context *ctx);
-static void loop_update(void);
+static void glfw_loop(void);
 void regist_func(duk_context *ctx, duk_c_function func, const char *str, int nargs);
 static void glfw_start(void);
 static void glfw_redraw(void);

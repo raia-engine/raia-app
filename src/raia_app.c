@@ -47,12 +47,12 @@ duk_ret_t raia_app_event_mouse_button_callback(duk_context *ctx) {
 duk_ret_t raia_app_event_update_enable(duk_context *ctx) {
     raia_header_t header = get_raia_header();
     if(header.exist_update_callback == true) {
-        loop_update();
+        glfw_loop();
     }
     return 0;
 }
 
-duk_ret_t raia_app_window_redraw(duk_context *ctx) {
+duk_ret_t raia_app_screen_redraw(duk_context *ctx) {
     glfw_redraw();
     return 0;
 }
@@ -139,7 +139,7 @@ static void wait_time_with_fps(double now, double prev, int fps) {
     }
 }
 
-static void loop_update(void) {
+static void glfw_loop(void) {
     double now = (double)clock() / CLOCKS_PER_SEC;
     double prev = (double)clock() / CLOCKS_PER_SEC;
     while(!glfwWindowShouldClose(get_raia_window())) {
@@ -152,7 +152,6 @@ static void loop_update(void) {
     }
 }
 
-/// GLFWの開始
 static void glfw_start(void) {
     glfw_init();
     raia_header_t header = get_raia_header();
@@ -161,7 +160,7 @@ static void glfw_start(void) {
     glfwMakeContextCurrent(glfw_window);
     glfwSwapInterval(1);
 
-    // HiDPI判定
+    // HiDPI
     int now_width, now_height;
     glfwGetFramebufferSize(glfw_window, &now_width, &now_height);
     if (now_width > header.window_width) {
@@ -171,14 +170,11 @@ static void glfw_start(void) {
     }
 }
 
-/// 再描画する
 static void glfw_redraw(void) {
     raia_header_t header = get_raia_header();
     raia_shader_t shader = get_raia_shader();
     GLFWwindow* glfw_window = get_raia_window();
     uint8_t* pixel_data = get_pixel_data();
-
-    // 描画の準備
     glViewport(0, 0, header.resolution_width, header.resolution_height); // Set the viewport
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
     glClear(GL_COLOR_BUFFER_BIT); // Clear the color buffer
