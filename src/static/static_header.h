@@ -39,6 +39,7 @@ typedef struct raia_header_t {
 
 void init_raia_header(void);
 raia_header_t get_raia_header(void);
+void set_window_size(int width, int height);
 void set_resolution_size(int width, int height);
 void set_title(char* title);
 void set_current_color(int r, int g, int b);

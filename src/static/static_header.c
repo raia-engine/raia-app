@@ -29,6 +29,11 @@ raia_header_t get_raia_header(void) {
     return raia_header;
 }
 
+void set_window_size(int width, int height) {
+    raia_header.window_width = width; // 画面解像度の幅と高さ
+    raia_header.window_height = height;
+}
+
 void set_resolution_size(int width, int height) {
     raia_header.resolution_width = width; // 画面解像度の幅と高さ
     raia_header.resolution_height = height;

@@ -20,7 +20,7 @@ void glfw_init(void) {
 }
 
 GLFWwindow* glfw_create_window(int width, int height, const char* title, GLFWmonitor* monitor, GLFWwindow* share) {
-    GLFWwindow* window = glfwCreateWindow(640, 480, title, NULL, NULL);
+    GLFWwindow* window = glfwCreateWindow(width, height, title, NULL, NULL);
     if (!window) {
         fprintf(stderr, "Window creation failed.\n");
         glfwTerminate();

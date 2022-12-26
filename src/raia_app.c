@@ -6,41 +6,39 @@
 #include "GLFW/glfw3.h"
 #include "EGL/egl.h"
 
-static duk_context* _ctx;
-
 duk_ret_t raia_app_event_error_callback(duk_context *ctx) {
-    duk_dup(_ctx, 0);
-    duk_put_global_string(_ctx, "_glfw_error_callback");
-    _ctx = ctx;
+    duk_dup(ctx, 0);
+    duk_put_global_string(ctx, "_glfw_error_callback");
+    set_context(ctx);
     return 0;
 }
 
 duk_ret_t raia_app_event_key_callback(duk_context *ctx) {
-    duk_dup(_ctx, 0);
-    duk_put_global_string(_ctx, "_glfw_key_callback");
-    _ctx = ctx;
+    duk_dup(ctx, 0);
+    duk_put_global_string(ctx, "_glfw_key_callback");
+    set_context(ctx);
     return 0;
 }
 
 duk_ret_t raia_app_event_update_callback(duk_context *ctx) {
-    duk_dup(_ctx, 0);
-    duk_put_global_string(_ctx, "_event_update_callback");
+    duk_dup(ctx, 0);
+    duk_put_global_string(ctx, "_event_update_callback");
     set_exist_update_callback(true);
-    _ctx = ctx;
+    set_context(ctx);
     return 0;
 }
 
 duk_ret_t raia_app_event_cursor_position_callback(duk_context *ctx) {
-    duk_dup(_ctx, 0);
-    duk_put_global_string(_ctx, "_glfw_cursor_position_callback");
-    _ctx = ctx;
+    duk_dup(ctx, 0);
+    duk_put_global_string(ctx, "_glfw_cursor_position_callback");
+    set_context(ctx);
     return 0;
 }
 
 duk_ret_t raia_app_event_mouse_button_callback(duk_context *ctx) {
-    duk_dup(_ctx, 0);
-    duk_put_global_string(_ctx, "_glfw_mouse_button_callback");
-    _ctx = ctx;
+    duk_dup(ctx, 0);
+    duk_put_global_string(ctx, "_glfw_mouse_button_callback");
+    set_context(ctx);
     return 0;
 }
 
@@ -69,60 +67,85 @@ duk_ret_t raia_app_window_should_close(duk_context *ctx) {
 }
 
 duk_ret_t raia_app_window_init(duk_context *ctx) {
-    _ctx = ctx;
+    int width = (int) duk_to_number(ctx, 1);
+    int height = (int) duk_to_number(ctx, 2);
+    const char *title = duk_to_string(ctx, 3);
+
+    //
+    // ctx ->
+    //
+    // ctx.text = 100;
+    //
+    //duk_to_object(ctx, 0);
+    //duk_push_string(ctx, "100");
+    //duk_put_prop_string(ctx, 0, "test");
+
+    //
+    // ctx.app = {
+    //    foo: "bar"
+    // }
+    //
+    //duk_to_object(ctx, 0);
+    //duk_idx_t obj_idx = duk_push_object(ctx);
+    //duk_push_string(ctx, "bar");
+    //duk_put_prop_string(ctx, obj_idx, "foo");
+    //duk_put_prop_string(ctx, 0, "app");
+
+    //
+    // ctx.app = {
+    //    window: {
+    //        width: <width>,
+    //        height: <height>,
+    //        title: <title>
+    //    }
+    // }
+    duk_to_object(ctx, 0);
+    duk_idx_t obj_idx2 = duk_push_object(ctx);
+    duk_idx_t obj_idx = duk_push_object(ctx);
+    duk_push_number(ctx, width);
+    duk_put_prop_string(ctx, obj_idx, "width");
+    duk_push_number(ctx, height);
+    duk_put_prop_string(ctx, obj_idx, "height");
+    duk_push_string(ctx, title);
+    duk_put_prop_string(ctx, obj_idx, "title");
+    duk_put_prop_string(ctx, obj_idx2, "window");
+    duk_put_prop_string(ctx, 0, "app");
+    duk_pop(ctx);
+
     init_raia_header(); // ヘッダー情報を初期化
+    set_window_size(width, height);
+    set_resolution_size(width, height);
+    set_title(title);
+
     raia_header_t header = get_raia_header(); // ヘッダーを取得
     init_pixel_data(header.window_width, header.window_height, header.samples_per_pixel); // ピクセルデータを初期化
     glfw_start(); // GLFWを開始
-    regist_callbacks(_ctx); // コールバック群を登録する
+    regist_callbacks(ctx); // コールバック群を登録する
     init_raia_shader(get_pixel_data(), header.window_width, header.window_height);
     glfw_redraw(); // 画面を再描画しておく
     return 0;
 }
 
-static void event_error_callback(int error, const char *message) {
-    fprintf(stderr, "GLFW: %s\n", message);
-    duk_get_global_string(_ctx, "_glfw_error_callback");
-    duk_push_int(_ctx, error);
-    duk_push_string(_ctx, message);
-    duk_pcall(_ctx, 2);
-    duk_pop(_ctx);  /* pop result */
+duk_ret_t raia_app_window_set_title(duk_context *ctx) {
+    const char *title = duk_to_string(ctx, 1);
+    GLFWwindow * window = get_raia_window();
+    glfwSetWindowTitle(window, title);
+    set_title(title);
+
+    duk_to_object(ctx, 0);
+
+    duk_push_string(ctx, "app");
+    duk_get_prop(ctx, 0);
+    duk_push_string(ctx, "window");
+    duk_get_prop(ctx, -2);
+    duk_push_string(ctx, title);
+    duk_put_prop_string(ctx, -2, "title");
+    duk_pop(ctx);
+
+    return 0;
 }
 
-static void event_key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
-    duk_get_global_string(_ctx, "_glfw_key_callback");
-    duk_push_int(_ctx, key);
-    duk_push_int(_ctx, scancode);
-    duk_push_int(_ctx, action);
-    duk_push_int(_ctx, mods);
-    duk_pcall(_ctx, 4);
-    duk_pop(_ctx);  /* pop result */
-}
-
-static void event_update_callback(void) {
-    duk_get_global_string(_ctx, "_event_update_callback");
-    duk_pcall(_ctx, 0);
-    duk_pop(_ctx);  /* pop result */
-}
-
-static void event_cursor_position_callback(GLFWwindow* window, double xpos, double ypos) {
-    duk_get_global_string(_ctx, "_glfw_cursor_position_callback");
-    duk_push_number(_ctx, xpos);
-    duk_push_number(_ctx, ypos);
-    duk_pcall(_ctx, 2);
-    duk_pop(_ctx);  /* pop result */
-}
-
-static void event_mouse_button_callback(GLFWwindow* window, int button, int action, int mods) {
-    duk_get_global_string(_ctx, "_glfw_mouse_button_callback");
-    duk_push_int(_ctx, button);
-    duk_push_int(_ctx, action);
-    duk_push_int(_ctx, mods);
-    duk_pcall(_ctx, 3);
-    duk_pop(_ctx);  /* pop result */
-}
-
-static void regist_callbacks(duk_context *ctx) {
+void regist_callbacks(duk_context *ctx) {
     glfwSetKeyCallback(get_raia_window(), event_key_callback); // キー入力コールバック
     glfwSetErrorCallback(event_error_callback); // エラーコールバック
     glfwSetCursorPosCallback(get_raia_window(), event_cursor_position_callback); // マウス移動
@@ -189,4 +212,7 @@ static void glfw_redraw(void) {
     glUniform1i(shader.sampler_location, 0); // Set the texture sampler to texture unit to 0
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, shader.indices);
     glfwSwapBuffers(glfw_window);
+}
+
+void init(void) {
 }
