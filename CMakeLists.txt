@@ -23,5 +23,5 @@ add_library(raia_app SHARED
 target_link_libraries(raia_app
         $<$<PLATFORM_ID:Darwin>: egl glfw GLESv2>
         $<$<PLATFORM_ID:Linux>: >
-        $<$<PLATFORM_ID:Windows>: >
+        $<$<PLATFORM_ID:Windows>: EGL glfw3 GLESv2>
         )

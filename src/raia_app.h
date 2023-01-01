@@ -1,6 +1,7 @@
 #ifndef RAIA_WINDOW_RAIA_APP_H
 #define RAIA_WINDOW_RAIA_APP_H
 
+#include <time.h>
 #include "duktape/duktape.h"
 #include "static/static_header.h"
 #include "static/static_window.h"
