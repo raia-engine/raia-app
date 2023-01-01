@@ -6,6 +6,14 @@
 #include "GLFW/glfw3.h"
 #include "EGL/egl.h"
 
+#include "platforms.h"
+#ifdef __WINDOWS__
+#define RAIA_EXPORT __declspec(dllexport) 
+#else
+#define RAIA_EXPORT
+#endif
+
+RAIA_EXPORT 
 duk_ret_t raia_app_event_error_callback(duk_context *ctx) {
     duk_dup(ctx, 0);
     duk_put_global_string(ctx, "_glfw_error_callback");
@@ -13,6 +21,7 @@ duk_ret_t raia_app_event_error_callback(duk_context *ctx) {
     return 0;
 }
 
+RAIA_EXPORT 
 duk_ret_t raia_app_event_key_callback(duk_context *ctx) {
     duk_dup(ctx, 0);
     duk_put_global_string(ctx, "_glfw_key_callback");
@@ -20,6 +29,7 @@ duk_ret_t raia_app_event_key_callback(duk_context *ctx) {
     return 0;
 }
 
+RAIA_EXPORT
 duk_ret_t raia_app_event_update_callback(duk_context *ctx) {
     duk_dup(ctx, 0);
     duk_put_global_string(ctx, "_event_update_callback");
@@ -28,6 +38,7 @@ duk_ret_t raia_app_event_update_callback(duk_context *ctx) {
     return 0;
 }
 
+RAIA_EXPORT
 duk_ret_t raia_app_event_cursor_position_callback(duk_context *ctx) {
     duk_dup(ctx, 0);
     duk_put_global_string(ctx, "_glfw_cursor_position_callback");
@@ -35,6 +46,7 @@ duk_ret_t raia_app_event_cursor_position_callback(duk_context *ctx) {
     return 0;
 }
 
+RAIA_EXPORT
 duk_ret_t raia_app_event_mouse_button_callback(duk_context *ctx) {
     duk_dup(ctx, 0);
     duk_put_global_string(ctx, "_glfw_mouse_button_callback");
@@ -42,6 +54,7 @@ duk_ret_t raia_app_event_mouse_button_callback(duk_context *ctx) {
     return 0;
 }
 
+RAIA_EXPORT
 duk_ret_t raia_app_event_update_enable(duk_context *ctx) {
     raia_header_t header = get_raia_header();
     if(header.exist_update_callback == true) {
@@ -50,22 +63,26 @@ duk_ret_t raia_app_event_update_enable(duk_context *ctx) {
     return 0;
 }
 
+RAIA_EXPORT
 duk_ret_t raia_app_screen_redraw(duk_context *ctx) {
     glfw_redraw();
     return 0;
 }
 
+RAIA_EXPORT
 duk_ret_t raia_app_window_pool_events(duk_context *ctx) {
     glfwPollEvents();
     return 0;
 }
 
+RAIA_EXPORT
 duk_ret_t raia_app_window_should_close(duk_context *ctx) {
     GLFWwindow *window = get_raia_window();
     duk_push_number(ctx, glfwWindowShouldClose(window));
     return 1;
 }
 
+RAIA_EXPORT
 duk_ret_t raia_app_window_init(duk_context *ctx) {
     int width = (int) duk_to_number(ctx, 1);
     int height = (int) duk_to_number(ctx, 2);
@@ -126,6 +143,7 @@ duk_ret_t raia_app_window_init(duk_context *ctx) {
     return 0;
 }
 
+RAIA_EXPORT
 duk_ret_t raia_app_window_set_title(duk_context *ctx) {
     const char *title = duk_to_string(ctx, 1);
     GLFWwindow * window = get_raia_window();
@@ -152,7 +170,7 @@ void regist_callbacks(duk_context *ctx) {
     glfwSetMouseButtonCallback(get_raia_window(), event_mouse_button_callback); // マウスボタン
 }
 
-static void wait_time_with_fps(double now, double prev, int fps) {
+void wait_time_with_fps(double now, double prev, int fps) {
     while(!glfwWindowShouldClose(get_raia_window())) { // ほぼ 60fps になるように待つ
         now = (double)clock() / CLOCKS_PER_SEC;
         if ((now - prev) > 1.0 / (double)fps) {
@@ -162,7 +180,7 @@ static void wait_time_with_fps(double now, double prev, int fps) {
     }
 }
 
-static void glfw_loop(void) {
+void glfw_loop(void) {
     double now = (double)clock() / CLOCKS_PER_SEC;
     double prev = (double)clock() / CLOCKS_PER_SEC;
     while(!glfwWindowShouldClose(get_raia_window())) {
@@ -175,7 +193,7 @@ static void glfw_loop(void) {
     }
 }
 
-static void glfw_start(void) {
+void glfw_start(void) {
     glfw_init();
     raia_header_t header = get_raia_header();
     init_raia_window(header.window_width, header.window_height, header.window_title);
@@ -193,7 +211,7 @@ static void glfw_start(void) {
     }
 }
 
-static void glfw_redraw(void) {
+void glfw_redraw(void) {
     raia_header_t header = get_raia_header();
     raia_shader_t shader = get_raia_shader();
     GLFWwindow* glfw_window = get_raia_window();
