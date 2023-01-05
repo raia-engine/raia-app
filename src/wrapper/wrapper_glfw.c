@@ -8,7 +8,6 @@
 #include "wrapper_glfw.h"
 
 void glfw_init(void) {
-
     if (glfwInit() != GL_TRUE) {
         fprintf(stderr, "Initialization of GLFW failed.\n");
         exit(EXIT_FAILURE);
