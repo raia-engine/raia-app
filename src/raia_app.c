@@ -13,6 +13,13 @@
 #define RAIA_EXPORT
 #endif
 
+RAIA_EXPORT
+duk_ret_t raia_app_glfw_init(duk_context *ctx) {
+    duk_push_c_function(ctx, dukopen_glfw, 0);
+    duk_call(ctx, 0);
+    duk_put_global_string(ctx, "glfw");
+}
+
 RAIA_EXPORT 
 duk_ret_t raia_app_event_error_callback(duk_context *ctx) {
     duk_dup(ctx, 0);
@@ -70,7 +77,7 @@ duk_ret_t raia_app_screen_redraw(duk_context *ctx) {
 }
 
 RAIA_EXPORT
-duk_ret_t raia_app_window_pool_events(duk_context *ctx) {
+duk_ret_t raia_app_window_poll_events(duk_context *ctx) {
     glfwPollEvents();
     return 0;
 }

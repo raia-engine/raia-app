@@ -3,6 +3,7 @@
 
 #include <time.h>
 #include "duktape/duktape.h"
+#include "duk_glfw/duk_glfw.h"
 #include "static/static_header.h"
 #include "static/static_window.h"
 #include "static/static_pixel_data.h"
@@ -23,6 +24,9 @@ void glfw_start(void);
 void glfw_redraw(void);
 void regist_callbacks(duk_context *ctx);
 void regist_func(duk_context *ctx, duk_c_function func, const char *str, int nargs);
+
+RAIA_EXPORT
+duk_ret_t raia_app_glfw_init(duk_context *ctx);
 
 RAIA_EXPORT
 duk_ret_t raia_app_event_key_callback(duk_context *ctx);
@@ -46,7 +50,7 @@ RAIA_EXPORT
 duk_ret_t raia_app_screen_redraw(duk_context *ctx);
 
 RAIA_EXPORT
-duk_ret_t raia_app_window_pool_events(duk_context *ctx);
+duk_ret_t raia_app_window_poll_events(duk_context *ctx);
 
 RAIA_EXPORT
 duk_ret_t raia_app_window_should_close(duk_context *ctx);

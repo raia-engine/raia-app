@@ -18,7 +18,7 @@ add_library(raia_app SHARED
         src/util/util_math.c
         src/duktape/duktape.c
         src/static/static_ctx.c
-        src/static/static_ctx.h)
+        src/static/static_ctx.h src/duk_glfw/duk_glfw.h src/duk_glfw/duk_glfw.c)
 
 target_link_libraries(raia_app
         $<$<PLATFORM_ID:Darwin>: egl glfw GLESv2>
